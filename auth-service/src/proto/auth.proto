@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ticket.grpc";
+option java_outer_classname = "AuthProto";
+
+package auth;
+
+service GreetService {
+  rpc Greet (GreetRequest) returns (GreetResponse);
+}
+
+message GreetRequest {
+  string name = 1;
+}
+
+message GreetResponse {
+  string greeting = 1;
+}
