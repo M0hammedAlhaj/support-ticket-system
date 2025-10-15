@@ -33,11 +33,6 @@ services:
       context: ./user-service
       dockerfile: Dockerfile
     env_file: ./user-service/.env
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
-      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS}
     ports:
       - "8082:8082"
     depends_on:
@@ -49,11 +44,6 @@ services:
       context: ./ticket-service
       dockerfile: Dockerfile
     env_file: ./ticket-service/.env
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
-      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS}
     ports:
       - "8083:8083"
     depends_on:
@@ -65,11 +55,6 @@ services:
       context: ./gateway-service
       dockerfile: Dockerfile
     env_file: ./gateway-service/.env
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
-      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS}
     ports:
       - "8080:8080"
     depends_on:
@@ -83,11 +68,6 @@ services:
       context: ./auth-service
       dockerfile: Dockerfile
     env_file: ./auth-service/.env
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
-      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS}
     ports:
       - "8081:8081"
     depends_on:
