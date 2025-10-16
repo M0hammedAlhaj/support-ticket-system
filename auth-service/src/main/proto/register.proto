@@ -11,9 +11,15 @@ service RegisterGrpc {
 }
 
 message RegistrationRequest {
-  string name = 1;
+  string email =1;
+  string password=2;
+  string name=3;
+  string userType=4;
+  string confirmPassword=5;
 }
 
 message RegistrationResponse {
-  string greeting = 1;
+  string id=1;
+  string email=2;
+  string name=3;
 }

@@ -1,0 +1,6 @@
+
+spring:
+  application:
+    name: spring.application.name=user-service
+
+  mong
