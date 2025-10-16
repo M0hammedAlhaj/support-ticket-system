@@ -7,6 +7,6 @@ public record CreateUserCommand(
         String lastName,
         String email,
         String password,
-        UserType userType
+        String userType
 ) {
 }
