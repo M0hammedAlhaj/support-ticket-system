@@ -1,6 +1,7 @@
 package com.ticket.userservice.user.application.create;
 
 import com.ticket.userservice.user.domain.entity.User;
+import com.ticket.userservice.user.domain.exception.EmailAlreadyExistsException;
 import com.ticket.userservice.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,11 @@ public class CreateUserUseCase {
     private final UserRepository userRepository;
 
     public User createUser(CreateUserCommand createUserCommand) {
+        var email = createUserCommand.email();
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new EmailAlreadyExistsException(email);
+        }
+
         var user = new User();
         user.setUuid(UUID.randomUUID());
         user.setFirstName(createUserCommand.firstName());
