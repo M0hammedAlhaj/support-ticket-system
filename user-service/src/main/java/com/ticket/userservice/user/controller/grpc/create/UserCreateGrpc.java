@@ -18,12 +18,13 @@ public class UserCreateGrpc extends UserCreateServiceGrpc.UserCreateServiceImplB
 
     @Override
     public void createUser(UserCreateRequest request, StreamObserver<UserCreateResponse> responseObserver) {
-        final var command = new CreateUserCommand(request.getFirstName(),
-                request.getLastName(),
-                request.getEmail(),
-                request.getPassword(),
-                request.getUserType());
         try {
+            final var command = new CreateUserCommand(request.getFirstName(),
+                    request.getLastName(),
+                    request.getEmail(),
+                    request.getPassword(),
+                    request.getUserType());
+
             createUserUseCase.createUser(command);
 
             final var response = UserCreateResponse.newBuilder()
