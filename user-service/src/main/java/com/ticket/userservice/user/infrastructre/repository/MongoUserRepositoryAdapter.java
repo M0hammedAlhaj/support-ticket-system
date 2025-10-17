@@ -19,6 +19,6 @@ public class MongoUserRepositoryAdapter implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return Optional.empty();
+        return springMongoUserRepository.findByEmail(email);
     }
 }

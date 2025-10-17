@@ -26,7 +26,7 @@ public class CreateUserUseCase {
         user.setUuid(UUID.randomUUID());
         user.setFirstName(createUserCommand.getFirstName());
         user.setLastName(createUserCommand.getLastName());
-        user.setEmail(createUserCommand.getEmail());
+        user.setEmail(email);
         user.setPassword(createUserCommand.getPassword());
         user.setUserType(createUserCommand.getUserType());
         user.setCreatedAt(LocalDateTime.now());

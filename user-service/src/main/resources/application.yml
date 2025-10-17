@@ -9,7 +9,6 @@ spring:
       database: ${MONGO_INITDB_DATABASE}
       username: ${MONGO_INITDB_ROOT_USERNAME}
       password: ${MONGO_INITDB_ROOT_PASSWORD}
-      authentication-database: admin
 
 grpc:
   server:
