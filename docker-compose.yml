@@ -34,7 +34,8 @@ services:
       dockerfile: Dockerfile
     env_file: ./user-service/.env
     ports:
-      - "8082:8082"
+      - "8082:8082"   # HTTP
+      - "9090:9090"   # gRPC
     depends_on:
       - mongo
       - rabbitmq
