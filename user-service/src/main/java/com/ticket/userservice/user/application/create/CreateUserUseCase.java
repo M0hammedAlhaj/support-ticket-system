@@ -3,20 +3,27 @@ package com.ticket.userservice.user.application.create;
 import com.ticket.userservice.user.domain.entity.User;
 import com.ticket.userservice.user.domain.exception.EmailAlreadyExistsException;
 import com.ticket.userservice.user.domain.repository.UserRepository;
-import jakarta.validation.Valid;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CreateUserUseCase {
 
     private final UserRepository userRepository;
+    private final Validator validate;
 
-    public User createUser(@Valid CreateUserCommand createUserCommand) {
+    public User createUser(CreateUserCommand createUserCommand) {
+        validationCommand(createUserCommand);
+
         var email = createUserCommand.getEmail();
         if (userRepository.findByEmail(email).isPresent()) {
             throw new EmailAlreadyExistsException(email);
@@ -34,5 +41,15 @@ public class CreateUserUseCase {
 
         userRepository.save(user);
         return user;
+    }
+
+    private void validationCommand(CreateUserCommand createUserCommand) {
+        Set<ConstraintViolation<CreateUserCommand>> violations = validate.validate(createUserCommand);
+        if (!violations.isEmpty()) {
+            String errors = violations.stream()
+                    .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                    .collect(Collectors.joining(", "));
+            throw new ValidationException(errors);
+        }
     }
 }

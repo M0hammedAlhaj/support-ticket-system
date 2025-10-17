@@ -20,5 +20,4 @@ message UserCreateRequest {
 
 message UserCreateResponse {
   string message = 1;
-  int32 http_status = 2;
 }

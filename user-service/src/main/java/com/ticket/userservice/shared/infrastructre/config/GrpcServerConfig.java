@@ -1,6 +1,6 @@
 package com.ticket.userservice.shared.infrastructre.config;
 
-import com.ticket.userservice.shared.infrastructre.handler.ValidationInterceptor;
+import com.ticket.userservice.shared.infrastructre.handler.GrpcExceptionInterceptor;
 import net.devh.boot.grpc.server.serverfactory.GrpcServerConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class GrpcServerConfig {
 
     @Bean
-    public GrpcServerConfigurer globalInterceptorConfigurer(ValidationInterceptor interceptor) {
+    public GrpcServerConfigurer globalInterceptorConfigurer(GrpcExceptionInterceptor interceptor) {
         return serverBuilder -> serverBuilder.intercept(interceptor);
     }
 }
