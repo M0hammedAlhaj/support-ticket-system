@@ -3,13 +3,14 @@ package com.ticket.userservice.user.domain.entity;
 import com.ticket.userservice.user.domain.model.UserType;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Document(collation = "users")
+@Document
 @Data
 public class User {
 
@@ -22,6 +23,7 @@ public class User {
 
     private String lastName;
 
+    @Indexed(unique = true, collation = "en")
     private String email;
 
     private String password;
