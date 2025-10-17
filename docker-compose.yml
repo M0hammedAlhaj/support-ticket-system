@@ -58,6 +58,7 @@ services:
     env_file: ./gateway-service/.env
     ports:
       - "8080:8080"
+      - "9091:9090"   # gRPC
     depends_on:
       - user-service
       - ticket-service
@@ -71,6 +72,7 @@ services:
     env_file: ./auth-service/.env
     ports:
       - "8081:8081"
+      - "9092:9090"
     depends_on:
       - rabbitmq
 
