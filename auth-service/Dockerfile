@@ -16,7 +16,7 @@ COPY src ./src
 
 RUN find /root/.gradle -type f -name "protoc-gen-grpc-java*" -exec chmod +x {} + || true
 
-RUN ./gradlew bootJar --no-daemon
+RUN ./gradlew bootJar --no-daemon --build-cache --parallel
 
 # ========================
 # Stage 2: Run the application
