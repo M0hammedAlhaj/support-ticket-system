@@ -4,7 +4,7 @@ import com.ticket.user_service.proto.UserCreateRequest;
 import com.ticket.user_service.proto.UserCreateServiceGrpc;
 import com.tickey.authservice.domain.register.model.UserAuth;
 import com.tickey.authservice.domain.register.service.UserCreate;
-import com.tickey.authservice.shared.DownstreamGrpcException;
+import com.tickey.authservice.shared.exception.DownStreamGrpcException;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -36,7 +36,7 @@ public class UserCreateGrpc implements UserCreate {
             var response = stub.createUser(request);
             return response.getMessage();
         } catch (StatusRuntimeException e) {
-            throw new DownstreamGrpcException(
+            throw new DownStreamGrpcException(
                     e.getStatus().getCode(),
                     e.getStatus().getDescription()
             );
