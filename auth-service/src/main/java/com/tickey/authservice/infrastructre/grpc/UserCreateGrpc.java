@@ -23,16 +23,16 @@ public class UserCreateGrpc implements UserCreate {
 
     @Override
     public String createUser(UserAuth userAuth) {
-        try {
-            final var request = UserCreateRequest.newBuilder()
-                    .setFirstName(userAuth.firstName())
-                    .setLastName(userAuth.lastName())
-                    .setEmail(userAuth.email())
-                    .setPassword(userAuth.password())
-                    .setUserType(userAuth.userType())
-                    .build();
-            var response = stub.createUser(request);
-            return response.getMessage();
-        }
+
+        final var request = UserCreateRequest.newBuilder()
+                .setFirstName(userAuth.firstName())
+                .setLastName(userAuth.lastName())
+                .setEmail(userAuth.email())
+                .setPassword(userAuth.password())
+                .setUserType(userAuth.userType())
+                .build();
+        var response = stub.createUser(request);
+
+        return response.getMessage();
     }
 }
