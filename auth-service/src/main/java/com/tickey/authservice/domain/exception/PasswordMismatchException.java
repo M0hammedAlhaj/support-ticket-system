@@ -1,4 +1,4 @@
-package com.tickey.authservice.domain.register.exception;
+package com.tickey.authservice.domain.exception;
 
 public class PasswordMismatchException extends RuntimeException {
     public PasswordMismatchException() {

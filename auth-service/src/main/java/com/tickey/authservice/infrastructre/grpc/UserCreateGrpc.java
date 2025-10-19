@@ -2,8 +2,8 @@ package com.tickey.authservice.infrastructre.grpc;
 
 import com.ticket.user_service.proto.UserCreateRequest;
 import com.ticket.user_service.proto.UserCreateServiceGrpc;
-import com.tickey.authservice.domain.register.model.UserAuth;
-import com.tickey.authservice.domain.register.service.UserCreate;
+import com.tickey.authservice.domain.model.NewUser;
+import com.tickey.authservice.domain.service.UserCreate;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.springframework.stereotype.Component;
@@ -22,14 +22,14 @@ public class UserCreateGrpc implements UserCreate {
     }
 
     @Override
-    public String createUser(UserAuth userAuth) {
+    public String createUser(NewUser newUser) {
 
         final var request = UserCreateRequest.newBuilder()
-                .setFirstName(userAuth.firstName())
-                .setLastName(userAuth.lastName())
-                .setEmail(userAuth.email())
-                .setPassword(userAuth.password())
-                .setUserType(userAuth.userType())
+                .setFirstName(newUser.firstName())
+                .setLastName(newUser.lastName())
+                .setEmail(newUser.email())
+                .setPassword(newUser.password())
+                .setUserType(newUser.userType())
                 .build();
         var response = stub.createUser(request);
 

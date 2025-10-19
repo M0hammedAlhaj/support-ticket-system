@@ -1,9 +1,9 @@
 package com.tickey.authservice.application.register;
 
-import com.tickey.authservice.domain.register.exception.PasswordMismatchException;
-import com.tickey.authservice.domain.register.model.UserAuth;
-import com.tickey.authservice.domain.register.service.PasswordEncryptor;
-import com.tickey.authservice.domain.register.service.UserCreate;
+import com.tickey.authservice.domain.exception.PasswordMismatchException;
+import com.tickey.authservice.domain.model.NewUser;
+import com.tickey.authservice.domain.service.PasswordEncryptor;
+import com.tickey.authservice.domain.service.UserCreate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class RegisterUserUseCase {
         }
 
         final var encodedPassword = passwordEncryptor.encode(password);
-        final var userAuth = new UserAuth(command.firstName(),
+        final var userAuth = new NewUser(command.firstName(),
                 command.lastName(),
                 command.email(),
                 encodedPassword,

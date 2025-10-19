@@ -5,7 +5,7 @@ import com.ticket.grpc.RegistrationRequest;
 import com.ticket.grpc.RegistrationResponse;
 import com.tickey.authservice.application.register.RegisterUserCommand;
 import com.tickey.authservice.application.register.RegisterUserUseCase;
-import com.tickey.authservice.domain.register.exception.PasswordMismatchException;
+import com.tickey.authservice.domain.exception.PasswordMismatchException;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
