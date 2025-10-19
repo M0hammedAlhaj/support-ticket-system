@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: spring.application.name=user-service
+
+  data:
+    mongodb:
+      host: ${MONGO_HOST}
+      port: ${MONGO_PORT}
+      database: ${MONGO_INITDB_DATABASE}
+      username: ${MONGO_INITDB_ROOT_USERNAME}
+      password: ${MONGO_INITDB_ROOT_PASSWORD}
+      auto-index-creation: true
+grpc:
+  server:
+    port: 9090
+    address: 0.0.0.0
+    max-inbound-message-size: 10485760
+    keepalive-time: 300s
+    keepalive-timeout: 30s
+    permit-keepalive-time: 300s
+
