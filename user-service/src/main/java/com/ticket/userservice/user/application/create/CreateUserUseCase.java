@@ -25,7 +25,7 @@ public class CreateUserUseCase {
         validationCommand(createUserCommand);
 
         var email = createUserCommand.getEmail();
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.existByEmail(email)) {
             throw new EmailAlreadyExistsException(email);
         }
 
