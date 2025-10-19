@@ -1,6 +1,7 @@
 package com.ticket.userservice.user.infrastructre.repository;
 
 import com.ticket.userservice.user.domain.entity.User;
+import com.ticket.userservice.user.domain.model.UserCredential;
 import com.ticket.userservice.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -20,5 +21,10 @@ public class MongoUserRepositoryAdapter implements UserRepository {
     @Override
     public boolean existByEmail(String email) {
         return springMongoUserRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<UserCredential> findByEmail(String email) {
+        return springMongoUserRepository.findUserCredentialByEmail(email);
     }
 }
