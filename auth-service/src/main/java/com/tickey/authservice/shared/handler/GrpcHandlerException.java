@@ -1,6 +1,5 @@
 package com.tickey.authservice.shared.handler;
 
-import com.tickey.authservice.shared.exception.DownStreamGrpcException;
 import io.grpc.*;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +20,9 @@ public class GrpcHandlerException implements ServerInterceptor {
             public void onHalfClose() {
                 try {
                     super.onHalfClose();
-                } catch (DownStreamGrpcException ex) {
+                } catch (StatusRuntimeException ex) {
                     call.close(
-                            Status.fromCodeValue(ex.getCode().value())
-                                    .withDescription(ex.getMessage())
-                                    .withCause(ex),
+                            ex.getStatus(),
                             new Metadata()
                     );
                 } catch (Exception ex) {
