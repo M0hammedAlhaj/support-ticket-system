@@ -6,14 +6,14 @@ import com.ticket.user_service.proto.UserCredentialServiceGrpc;
 import com.ticket.userservice.user.application.get.GetUserCredentialCommand;
 import com.ticket.userservice.user.application.get.GetUserCredentialUseCase;
 import io.grpc.stub.StreamObserver;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 @GrpcService
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserCredentialGrpc extends UserCredentialServiceGrpc.UserCredentialServiceImplBase {
 
-    private GetUserCredentialUseCase useCase;
+    private final GetUserCredentialUseCase useCase;
 
     @Override
     public void getUserCredential(UserCredentialRequest request, StreamObserver<UserCredentialResponse> responseObserver) {
@@ -24,6 +24,7 @@ public class UserCredentialGrpc extends UserCredentialServiceGrpc.UserCredential
                 .setEmail(credential.email())
                 .setPassword(credential.password())
                 .build();
+
         responseObserver.onNext(userCredentialResponse);
         responseObserver.onCompleted();
     }

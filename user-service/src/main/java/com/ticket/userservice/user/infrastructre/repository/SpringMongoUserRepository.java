@@ -14,6 +14,6 @@ public interface SpringMongoUserRepository extends MongoRepository<User, UUID> {
 
     boolean existsByEmail(String email);
 
-    @Query(value = "{ 'email': ?0 }", fields = "{ 'firstName': 1, 'lastName': 1}")
+    @Query(value = "{ 'email': ?0 }", fields = "{ 'email': 1, 'password': 1}")
     Optional<UserCredential> findUserCredentialByEmail(String email);
 }
