@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ticket.grpc";
+option java_outer_classname = "LogiProto";
+
+package auth;
+
+service LoginGrpc {
+  rpc Login (LoginRequest) returns (LoginResponse);
+}
+
+message LoginRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}

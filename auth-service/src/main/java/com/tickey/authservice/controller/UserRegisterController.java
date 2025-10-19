@@ -1,4 +1,4 @@
-package com.tickey.authservice.controller.register;
+package com.tickey.authservice.controller;
 
 import com.ticket.grpc.RegisterGrpcGrpc;
 import com.ticket.grpc.RegistrationRequest;
