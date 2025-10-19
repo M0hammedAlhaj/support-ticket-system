@@ -3,7 +3,7 @@ package com.tickey.authservice.application.register;
 import com.tickey.authservice.domain.exception.PasswordMismatchException;
 import com.tickey.authservice.domain.model.NewUser;
 import com.tickey.authservice.domain.service.PasswordEncryptor;
-import com.tickey.authservice.domain.service.UserCreate;
+import com.tickey.authservice.domain.service.UserCreatePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RegisterUserUseCase {
 
-    private final UserCreate userCreate;
+    private final UserCreatePort userCreate;
     private final PasswordEncryptor passwordEncryptor;
 
     public String execute(RegisterUserCommand command) {
