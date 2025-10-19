@@ -1,6 +1,6 @@
 package com.ticket.userservice.user.application.get;
 
-import com.ticket.userservice.user.domain.exception.ResourcesNotFound;
+import com.ticket.userservice.user.domain.exception.ResourcesNotFoundException;
 import com.ticket.userservice.user.domain.model.UserCredential;
 import com.ticket.userservice.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class GetUserCredentialUseCase {
         final var email = command.email();
         final var user = userRepository.findByEmail(email);
         if (user.isEmpty()) {
-            throw new ResourcesNotFound("User not found by Email: " + email);
+            throw new ResourcesNotFoundException("User not found by Email: " + email);
         }
         return user.get();
     }

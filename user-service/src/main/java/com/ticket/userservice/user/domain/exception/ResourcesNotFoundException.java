@@ -1,7 +1,7 @@
 package com.ticket.userservice.user.domain.exception;
 
-public class ResourcesNotFound extends RuntimeException {
-    public ResourcesNotFound(String message) {
+public class ResourcesNotFoundException extends RuntimeException {
+    public ResourcesNotFoundException(String message) {
         super(message);
     }
 }
