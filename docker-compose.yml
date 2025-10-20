@@ -2,79 +2,125 @@ services:
   mongo:
     image: mongo:6
     container_name: mongo
-    env_file: ./user-service/.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
     ports:
-      - "27017:27017"
+      - "${MONGO_PORT}:27017"
     volumes:
       - mongo_data:/data/db
+    env_file: .env
 
   postgres:
     image: postgres:15-alpine
-    env_file: ./ticket-service/.env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    env_file: .env
       
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_DEFAULT_USER: ${SPRING_RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${SPRING_RABBITMQ_PASSWORD}
     ports:
-      - "5672:5672"
+      - "${SPRING_RABBITMQ_PORT}:5672"
       - "15672:15672"  
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    env_file: .env
 
   user-service:
     build: 
       context: ./user-service
       dockerfile: Dockerfile
-    env_file: ./user-service/.env
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - USER_SERVICE_PORT=${USER_SERVICE_PORT}
+      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - USER_DB_NAME=${USER_DB_NAME}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT}
+      - LOGGING_LEVEL_COM_TICKEY=${LOGGING_LEVEL_COM_TICKEY}
     ports:
-      - "8082:8082"   # HTTP
-      - "9090:9090"   # gRPC
+      - "${USER_SERVICE_PORT}:${USER_SERVICE_PORT}"
+      - "9092:${GRPC_SERVER_PORT}"
     depends_on:
       - mongo
-      - rabbitmq
+    env_file: .env
 
   ticket-service:
     build: 
       context: ./ticket-service
       dockerfile: Dockerfile
-    env_file: ./ticket-service/.env
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - TICKET_SERVICE_PORT=${TICKET_SERVICE_PORT}
+      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT}
+      - LOGGING_LEVEL_COM_TICKEY=${LOGGING_LEVEL_COM_TICKEY}
     ports:
-      - "8083:8083"
+      - "${TICKET_SERVICE_PORT}:${TICKET_SERVICE_PORT}"
+      - "9093:${GRPC_SERVER_PORT}"
     depends_on:
       - postgres
-      - rabbitmq
-
-  gateway-service:
-    build: 
-      context: ./gateway-service
-      dockerfile: Dockerfile
-    env_file: ./gateway-service/.env
-    ports:
-      - "8080:8080"
-      - "9091:9090"   # gRPC
-    depends_on:
-      - user-service
-      - ticket-service
-      - auth-service
-      - rabbitmq
+    env_file: .env
 
   auth-service:
     build: 
       context: ./auth-service
       dockerfile: Dockerfile
-    env_file: ./auth-service/.env
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - AUTH_SERVICE_PORT=${AUTH_SERVICE_PORT}
+      - GRPC_SERVER_PORT=${GRPC_SERVER_PORT}
+      - USER_SERVICE_GRPC_HOST=${USER_SERVICE_GRPC_HOST}
+      - USER_SERVICE_GRPC_PORT=${USER_SERVICE_GRPC_PORT}
+      - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT}
+      - LOGGING_LEVEL_COM_TICKEY=${LOGGING_LEVEL_COM_TICKEY}
     ports:
-      - "8081:8081"
-      - "9092:9090"
+      - "${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}"
+      - "9091:${GRPC_SERVER_PORT}"
     depends_on:
+      - user-service
+    env_file: .env
+
+  gateway-service:
+    build: 
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - GATEWAY_SERVICE_PORT=${GATEWAY_SERVICE_PORT}
+      - AUTH_SERVICE_GRPC_HOST=${AUTH_SERVICE_GRPC_HOST}
+      - AUTH_SERVICE_GRPC_PORT=${AUTH_SERVICE_GRPC_PORT}
+      - SPRING_RABBITMQ_HOST=${SPRING_RABBITMQ_HOST}
+      - SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT}
+      - SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME}
+      - SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
+      - LOGGING_LEVEL_ROOT=${LOGGING_LEVEL_ROOT}
+      - LOGGING_LEVEL_COM_TICKEY=${LOGGING_LEVEL_COM_TICKEY}
+    ports:
+      - "${GATEWAY_SERVICE_PORT}:${GATEWAY_SERVICE_PORT}"
+    depends_on:
+      - auth-service
       - rabbitmq
+    env_file: .env
 
 volumes:
   mongo_data:

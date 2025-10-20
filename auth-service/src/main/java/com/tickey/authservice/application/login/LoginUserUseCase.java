@@ -19,7 +19,7 @@ public class LoginUserUseCase {
 
     public String execute(LoginUserCommand loginUserCommand) {
         final var credential = userCredentialPort.findUserCredential(loginUserCommand.email());
-        if (!passwordEncryptor.matches(credential.password(), loginUserCommand.password())) {
+        if (!passwordEncryptor.matches(loginUserCommand.password(), credential.password())) {
             throw new CredentialInvalidException();
         }
 

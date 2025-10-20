@@ -15,7 +15,7 @@ public class GlobalHandlerException {
             case INVALID_ARGUMENT -> ResponseEntity.badRequest().body(ex.getStatus().getDescription());
             case ALREADY_EXISTS -> ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getStatus().getDescription());
             case NOT_FOUND -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getStatus().getDescription());
-            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error");
+            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getStatus().getDescription());
         };
     }
 }

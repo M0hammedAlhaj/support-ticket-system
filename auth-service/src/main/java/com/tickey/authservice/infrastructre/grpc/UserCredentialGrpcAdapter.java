@@ -4,22 +4,14 @@ import com.ticket.user_service.proto.UserCredentialRequest;
 import com.ticket.user_service.proto.UserCredentialServiceGrpc;
 import com.tickey.authservice.domain.model.UserCredential;
 import com.tickey.authservice.domain.service.UserCredentialPort;
-import io.grpc.ManagedChannelBuilder;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserCredentialGrpcAdapter implements UserCredentialPort {
 
-    private final UserCredentialServiceGrpc.UserCredentialServiceBlockingStub stub;
-
-    public UserCredentialGrpcAdapter() {
-        var managedChannel = ManagedChannelBuilder
-                .forAddress("user-service", 9090)
-                .usePlaintext()
-                .build();
-        this.stub = UserCredentialServiceGrpc.newBlockingStub(managedChannel);
-    }
-
+    @GrpcClient("user-service")
+    private UserCredentialServiceGrpc.UserCredentialServiceBlockingStub stub;
 
     @Override
     public UserCredential findUserCredential(String email) {
