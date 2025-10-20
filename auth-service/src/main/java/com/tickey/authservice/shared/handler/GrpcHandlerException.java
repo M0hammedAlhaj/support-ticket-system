@@ -33,7 +33,6 @@ public class GrpcHandlerException implements ServerInterceptor {
                 } catch (Exception ex) {
                     log.error("Unexpected internal error in gRPC call {}: {}",
                             call.getMethodDescriptor().getFullMethodName(), ex.getMessage(), ex);
-
                     call.close(
                             Status.INTERNAL.withDescription("Internal server error"),
                             new Metadata()

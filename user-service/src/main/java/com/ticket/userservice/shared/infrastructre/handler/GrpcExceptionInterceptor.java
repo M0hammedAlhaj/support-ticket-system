@@ -36,12 +36,6 @@ public class GrpcExceptionInterceptor implements ServerInterceptor {
                             Status.NOT_FOUND.withDescription(e.getMessage()),
                             new Metadata()
                     );
-                } catch (Exception ex) {
-                    log.error("Unexpected gRPC error occurred: {}", ex.getMessage(), ex);
-                    call.close(
-                            Status.INTERNAL.withDescription("Internal server error"),
-                            new Metadata()
-                    );
                 }
             }
         };

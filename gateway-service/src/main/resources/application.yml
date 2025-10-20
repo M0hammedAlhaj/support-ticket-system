@@ -14,9 +14,11 @@ spring:
     password: ${SPRING_RABBITMQ_PASSWORD:admin123}
 
 grpc:
+  server:
+    enabled: false  # Disable gRPC server since gateway is client-only
   client:
     auth-service:
-      address: static://${AUTH_SERVICE_GRPC_HOST:auth-service}:${AUTH_SERVICE_GRPC_PORT:9091}
+      address: static://${AUTH_SERVICE_GRPC_HOST:localhost}:${AUTH_SERVICE_GRPC_PORT:9091}
       negotiationType: plaintext
 
 logging:

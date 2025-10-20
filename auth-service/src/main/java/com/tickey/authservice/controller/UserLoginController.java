@@ -7,6 +7,7 @@ import com.tickey.authservice.application.login.LoginUserCommand;
 import com.tickey.authservice.application.login.LoginUserUseCase;
 import com.tickey.authservice.domain.exception.CredentialInvalidException;
 import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -27,12 +28,19 @@ public class UserLoginController extends LoginGrpcGrpc.LoginGrpcImplBase {
                     .build();
             responseObserver.onNext(response);
             responseObserver.onCompleted();
+
         } catch (CredentialInvalidException e) {
             responseObserver.onError(
                     Status.UNAUTHENTICATED
                             .withDescription("Invalid email or password")
                             .asRuntimeException()
             );
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {
+                responseObserver.onError(Status.UNAUTHENTICATED
+                        .withDescription("Invalid email or password")
+                        .asRuntimeException());
+            }
         }
     }
 }
