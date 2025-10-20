@@ -1,10 +1,17 @@
 package com.ticket.userservice.shared.infrastructre.handler;
 
+import com.ticket.userservice.user.domain.exception.ResourcesNotFoundException;
 import io.grpc.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class GrpcExceptionInterceptor implements ServerInterceptor {
+
+    private static final Logger log = LoggerFactory.getLogger(GrpcExceptionInterceptor.class);
+
+
     @Override
     public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
             ServerCall<ReqT, RespT> call,
@@ -24,9 +31,9 @@ public class GrpcExceptionInterceptor implements ServerInterceptor {
                             Status.INVALID_ARGUMENT.withDescription(ex.getMessage()),
                             new Metadata()
                     );
-                } catch (Exception ex) {
+                } catch (ResourcesNotFoundException e) {
                     call.close(
-                            Status.INTERNAL.withDescription("Internal server error"),
+                            Status.NOT_FOUND.withDescription(e.getMessage()),
                             new Metadata()
                     );
                 }

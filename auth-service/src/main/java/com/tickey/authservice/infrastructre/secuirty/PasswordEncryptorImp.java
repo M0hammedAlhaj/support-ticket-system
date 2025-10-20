@@ -1,6 +1,6 @@
 package com.tickey.authservice.infrastructre.secuirty;
 
-import com.tickey.authservice.domain.register.service.PasswordEncryptor;
+import com.tickey.authservice.domain.service.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

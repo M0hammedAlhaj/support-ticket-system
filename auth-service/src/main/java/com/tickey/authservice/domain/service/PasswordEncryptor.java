@@ -1,4 +1,4 @@
-package com.tickey.authservice.domain.register.service;
+package com.tickey.authservice.domain.service;
 
 public interface PasswordEncryptor {
 

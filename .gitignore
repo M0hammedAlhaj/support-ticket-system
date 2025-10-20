@@ -24,6 +24,16 @@ Thumbs.db
 *.swo
 *.bak
 
-
-#env
+# Environment files (keep example files)
+.env
+.env.local
+.env.docker
+.env.prod
 *.env
+!.env.example
+
+# Local development
+local_services.pid
+
+run-local-db.sh
+switch-env.sh
