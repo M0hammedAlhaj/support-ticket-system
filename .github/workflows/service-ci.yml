@@ -88,9 +88,12 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
 
-  push:
+jobs:
+  push-image:
     runs-on: ubuntu-latest
     needs: version
+    env:
+      ORG_NAME: ticket-system   # <-- your org as env variable
     steps:
       - name: Download Image
         uses: actions/download-artifact@v4
@@ -109,7 +112,8 @@ jobs:
       
       - name: Tag and Push
         run: |
-          docker tag myorg/${{ inputs.service-name }}:build myorg/${{ inputs.service-name }}:${{ needs.version.outputs.version }}
-          docker tag myorg/${{ inputs.service-name }}:build myorg/${{ inputs.service-name }}:latest
-          docker push myorg/${{ inputs.service-name }}:${{ needs.version.outputs.version }}
-          docker push myorg/${{ inputs.service-name }}:latest
+          docker tag ${{ env.ORG_NAME }}/${{ inputs.service-name }}:build ${{ env.ORG_NAME }}/${{ inputs.service-name }}:${{ needs.version.outputs.version }}
+          docker tag ${{ env.ORG_NAME }}/${{ inputs.service-name }}:build ${{ env.ORG_NAME }}/${{ inputs.service-name }}:latest
+          docker push ${{ env.ORG_NAME }}/${{ inputs.service-name }}:${{ needs.version.outputs.version }}
+          docker push ${{ env.ORG_NAME }}/${{ inputs.service-name }}:latest
+
