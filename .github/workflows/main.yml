@@ -33,7 +33,7 @@ jobs:
           fi
 
   detect-changes:
-    needs: verify-dockerhub
+    needs: build-image
     runs-on: ubuntu-latest
     outputs:
       auth: ${{ steps.filter.outputs.auth }}
