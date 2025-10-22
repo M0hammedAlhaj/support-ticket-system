@@ -52,18 +52,32 @@ jobs:
     with:
       service-name: user-service
 
-  # CHECKPOINT: All builds must succeed (no if: always())
+  # CHECKPOINT: All builds must succeed
   verify-all-builds:
     needs: [auth-build, gateway-build, user-build]
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: All builds passed
-        run: echo "✅ All builds passed. Proceeding to push."
+      - name: Check build results
+        run: |
+          echo "auth-build: ${{ needs.auth-build.result }}"
+          echo "gateway-build: ${{ needs.gateway-build.result }}"
+          echo "user-build: ${{ needs.user-build.result }}"
+          
+          # Fail if any build that ran has failed
+          if [[ "${{ needs.auth-build.result }}" == "failure" ]] || \
+             [[ "${{ needs.gateway-build.result }}" == "failure" ]] || \
+             [[ "${{ needs.user-build.result }}" == "failure" ]]; then
+            echo " One or more builds failed"
+            exit 1
+          fi
+          
+          echo " All builds passed or were skipped. Proceeding to push."
 
   # PHASE 2: Push (only if all builds succeeded)
   auth-push:
     needs: [detect-changes, verify-all-builds]
-    if: needs.detect-changes.outputs.auth == 'true'
+    if: needs.detect-changes.outputs.auth == 'true' && needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
     secrets: inherit
     with:
@@ -71,7 +85,7 @@ jobs:
 
   gateway-push:
     needs: [detect-changes, verify-all-builds]
-    if: needs.detect-changes.outputs.gateway == 'true'
+    if: needs.detect-changes.outputs.gateway == 'true' && needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
     secrets: inherit
     with:
@@ -79,7 +93,7 @@ jobs:
 
   user-push:
     needs: [detect-changes, verify-all-builds]
-    if: needs.detect-changes.outputs.user == 'true'
+    if: needs.detect-changes.outputs.user == 'true' && needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
     secrets: inherit
     with:
