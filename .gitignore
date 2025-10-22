@@ -3,9 +3,9 @@
 **/build/
 **/out/
 
-# Gradle Wrapper
-**/gradle-wrapper.jar
-**/gradle-wrapper.properties
+# Gradle Wrapper - DO NOT ignore these, they're needed for builds!
+# **/gradle-wrapper.jar
+# **/gradle-wrapper.properties
 
 #IDEA
 **/.idea/

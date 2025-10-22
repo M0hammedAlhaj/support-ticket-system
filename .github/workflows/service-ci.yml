@@ -20,9 +20,15 @@ jobs:
           
       - uses: actions/checkout@v4
       
-      - name: Build Service
+      - name: Verify files exist
         run: |
-          cd ${{ inputs.service-name }}
+          ls -la
+          ls -la ${{ inputs.service-name }}/
+          ls -la ${{ inputs.service-name }}/gradle/wrapper/ || echo "Wrapper directory not found"
+          
+      - name: Build Service
+        working-directory: ${{ inputs.service-name }}
+        run: |
           chmod +x gradlew
           ./gradlew build -x test
       - name: Upload build artifacts
@@ -45,8 +51,8 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Test Service
+        working-directory: ${{ inputs.service-name }}
         run: |
-          cd ${{ inputs.service-name }}
           chmod +x gradlew
           ./gradlew test
 
