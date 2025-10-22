@@ -13,6 +13,9 @@ jobs:
     container:
       image: eclipse-temurin:21-jdk-alpine
     steps:
+      - name: Install compatibility libraries
+        run: apk add --no-cache libc6-compat gcompat libstdc++ git
+      
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -34,6 +37,9 @@ jobs:
         image: eclipse-temurin:21-jdk-alpine
       needs: build
       steps:
+        - name: Install compatibility libraries
+          run: apk add --no-cache libc6-compat gcompat libstdc++ git
+        
         - name: Checkout code
           uses: actions/checkout@v4
         
