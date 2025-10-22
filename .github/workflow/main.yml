@@ -10,45 +10,43 @@ jobs:
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      auth: ${{ steps.set.outputs.auth }}
-      gateway: ${{ steps.set.outputs.gateway }}
-      user: ${{ steps.set.outputs.user }}
+      auth: ${{ steps.filter.outputs.auth }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      user: ${{ steps.filter.outputs.user }}
     steps:
       - uses: actions/checkout@v3
-      - id: set
-        run: |
-          git fetch origin main
-          CHANGED=$(git diff --name-only origin/main HEAD)
-
-          AUTH=false
-          GATEWAY=false
-          USER=false
-
-          if echo "$CHANGED" | grep -q "^auth-service/"; then AUTH=true; fi
-          if echo "$CHANGED" | grep -q "^gateway-service/"; then GATEWAY=true; fi
-          if echo "$CHANGED" | grep -q "^user-service/"; then USER=true; fi
-
-          echo "auth=$AUTH" >> $GITHUB_OUTPUT
-          echo "gateway=$GATEWAY" >> $GITHUB_OUTPUT
-          echo "user=$USER" >> $GITHUB_OUTPUT
+      
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            auth:
+              - 'auth-service/**'
+            gateway:
+              - 'gateway-service/**'
+            user:
+              - 'user-service/**'
 
   auth-ci:
-    uses: ./.github/workflows/service-ci.yml
+    needs: detect-changes
     if: needs.detect-changes.outputs.auth == 'true'
+    uses: ./.github/workflows/service-ci.yml
     secrets: inherit
     with:
       service-name: auth-service
 
   gateway-ci:
-    uses: ./.github/workflows/service-ci.yml
+    needs: detect-changes
     if: needs.detect-changes.outputs.gateway == 'true'
+    uses: ./.github/workflows/service-ci.yml
     secrets: inherit
     with:
       service-name: gateway-service
 
   user-ci:
-    uses: ./.github/workflows/service-ci.yml
+    needs: detect-changes
     if: needs.detect-changes.outputs.user == 'true'
+    uses: ./.github/workflows/service-ci.yml
     secrets: inherit
     with:
       service-name: user-service
