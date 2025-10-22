@@ -7,7 +7,34 @@ on:
     branches: [master]
 
 jobs:
+  # PRE-CHECK: Verify Docker Hub credentials early
+  verify-dockerhub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Docker Hub Credentials
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        run: |
+          if [[ -z "$DOCKERHUB_USERNAME" ]] || [[ -z "$DOCKERHUB_TOKEN" ]]; then
+            echo "❌ Docker Hub credentials are missing!"
+            echo "Please set DOCKER_USERNAME and DOCKER_TOKEN secrets"
+            exit 1
+          fi
+          
+          echo "🔐 Testing Docker Hub login..."
+          echo "${DOCKERHUB_TOKEN}" | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Docker Hub credentials are valid"
+            docker logout
+          else
+            echo "❌ Docker Hub login failed"
+            exit 1
+          fi
+
   detect-changes:
+    needs: verify-dockerhub
     runs-on: ubuntu-latest
     outputs:
       auth: ${{ steps.filter.outputs.auth }}
