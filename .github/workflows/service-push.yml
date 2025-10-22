@@ -1,0 +1,47 @@
+name: Service Push to Registry
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        required: true
+        type: string
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - id: version
+        run: |
+          VERSION=$(date +%Y%m%d)-${GITHUB_SHA::7}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+  push-image:
+    runs-on: ubuntu-latest
+    needs: version
+    steps:
+      - name: Download Image
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-${{ inputs.service-name }}
+          path: /tmp
+      
+      - name: Load Docker Image
+        run: docker load -i /tmp/${{ inputs.service-name }}-image.tar
+      
+      - name: Push Docker image
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        run: |
+          echo "${DOCKERHUB_TOKEN}" | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
+          docker tag myorg/${{ inputs.service-name }}:build ${DOCKERHUB_USERNAME}/${{ inputs.service-name }}:${{ needs.version.outputs.version }}
+          docker push ${DOCKERHUB_USERNAME}/${{ inputs.service-name }}:${{ needs.version.outputs.version }}
+          docker tag myorg/${{ inputs.service-name }}:build ${DOCKERHUB_USERNAME}/${{ inputs.service-name }}:latest
+          docker push ${DOCKERHUB_USERNAME}/${{ inputs.service-name }}:latest
+      
+      - name: Push success
+        run: echo " Successfully pushed ${{ inputs.service-name }} to Docker Hub"
