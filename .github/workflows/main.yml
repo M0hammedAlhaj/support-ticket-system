@@ -7,8 +7,7 @@ on:
     branches: [master]
 
 jobs:
-  # PRE-CHECK: Verify Docker Hub credentials early
-  verify-dockerhub:
+  pre:
     runs-on: ubuntu-latest
     steps:
       - name: Verify Docker Hub Credentials
@@ -17,19 +16,19 @@ jobs:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: |
           if [[ -z "$DOCKERHUB_USERNAME" ]] || [[ -z "$DOCKERHUB_TOKEN" ]]; then
-            echo "❌ Docker Hub credentials are missing!"
+            echo " Docker Hub credentials are missing!"
             echo "Please set DOCKER_USERNAME and DOCKER_TOKEN secrets"
             exit 1
           fi
           
-          echo "🔐 Testing Docker Hub login..."
+          echo "Testing Docker Hub login..."
           echo "${DOCKERHUB_TOKEN}" | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
           
           if [ $? -eq 0 ]; then
-            echo "✅ Docker Hub credentials are valid"
+            echo " Docker Hub credentials are valid"
             docker logout
           else
-            echo "❌ Docker Hub login failed"
+            echo "Docker Hub login failed"
             exit 1
           fi
 
@@ -54,7 +53,6 @@ jobs:
             user:
               - 'user-service/**'
 
-  # PHASE 1: Build & Test (parallel, fail-fast)
   auth-build:
     needs: detect-changes
     if: needs.detect-changes.outputs.auth == 'true'
@@ -79,7 +77,6 @@ jobs:
     with:
       service-name: user-service
 
-  # CHECKPOINT: All builds must succeed
   verify-all-builds:
     needs: [auth-build, gateway-build, user-build]
     if: always()
@@ -101,7 +98,6 @@ jobs:
           
           echo " All builds passed or were skipped. Proceeding to push."
 
-  # PHASE 2: Push (only if all builds succeeded)
   auth-push:
     needs: [detect-changes, verify-all-builds]
     if: |
