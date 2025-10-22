@@ -7,7 +7,33 @@ on:
     branches: [master]
 
 jobs:
+  pre:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify Docker Hub Credentials
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        run: |
+          if [[ -z "$DOCKERHUB_USERNAME" ]] || [[ -z "$DOCKERHUB_TOKEN" ]]; then
+            echo " Docker Hub credentials are missing!"
+            echo "Please set DOCKER_USERNAME and DOCKER_TOKEN secrets"
+            exit 1
+          fi
+          
+          echo "Testing Docker Hub login..."
+          echo "${DOCKERHUB_TOKEN}" | docker login --username "${DOCKERHUB_USERNAME}" --password-stdin
+          
+          if [ $? -eq 0 ]; then
+            echo " Docker Hub credentials are valid"
+            docker logout
+          else
+            echo "Docker Hub login failed"
+            exit 1
+          fi
+
   detect-changes:
+    needs: pre
     runs-on: ubuntu-latest
     outputs:
       auth: ${{ steps.filter.outputs.auth }}
@@ -27,26 +53,80 @@ jobs:
             user:
               - 'user-service/**'
 
-  auth-ci:
+  auth-build:
     needs: detect-changes
     if: needs.detect-changes.outputs.auth == 'true'
-    uses: ./.github/workflows/service-ci.yml
+    uses: ./.github/workflows/service-build.yml
     secrets: inherit
     with:
       service-name: auth-service
 
-  gateway-ci:
+  gateway-build:
     needs: detect-changes
     if: needs.detect-changes.outputs.gateway == 'true'
-    uses: ./.github/workflows/service-ci.yml
+    uses: ./.github/workflows/service-build.yml
     secrets: inherit
     with:
       service-name: gateway-service
 
-  user-ci:
+  user-build:
     needs: detect-changes
     if: needs.detect-changes.outputs.user == 'true'
-    uses: ./.github/workflows/service-ci.yml
+    uses: ./.github/workflows/service-build.yml
+    secrets: inherit
+    with:
+      service-name: user-service
+
+  verify-all-builds:
+    needs: [auth-build, gateway-build, user-build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build results
+        run: |
+          echo "auth-build: ${{ needs.auth-build.result }}"
+          echo "gateway-build: ${{ needs.gateway-build.result }}"
+          echo "user-build: ${{ needs.user-build.result }}"
+          
+          # Fail if any build that ran has failed
+          if [[ "${{ needs.auth-build.result }}" == "failure" ]] || \
+             [[ "${{ needs.gateway-build.result }}" == "failure" ]] || \
+             [[ "${{ needs.user-build.result }}" == "failure" ]]; then
+            echo " One or more builds failed"
+            exit 1
+          fi
+          
+          echo " All builds passed or were skipped. Proceeding to push."
+
+  auth-push:
+    needs: [detect-changes, verify-all-builds]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.auth == 'true' && 
+      needs.verify-all-builds.result == 'success'
+    uses: ./.github/workflows/service-push.yml
+    secrets: inherit
+    with:
+      service-name: auth-service
+
+  gateway-push:
+    needs: [detect-changes, verify-all-builds]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.gateway == 'true' && 
+      needs.verify-all-builds.result == 'success'
+    uses: ./.github/workflows/service-push.yml
+    secrets: inherit
+    with:
+      service-name: gateway-service
+
+  user-push:
+    needs: [detect-changes, verify-all-builds]
+    if: |
+      always() &&
+      needs.detect-changes.outputs.user == 'true' && 
+      needs.verify-all-builds.result == 'success'
+    uses: ./.github/workflows/service-push.yml
     secrets: inherit
     with:
       service-name: user-service

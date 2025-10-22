@@ -1,0 +1,65 @@
+name: Service Build & Test
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: eclipse-temurin:21-jdk-alpine
+    steps:
+      - name: Install compatibility libraries
+        run: apk add --no-cache libc6-compat gcompat libstdc++ git
+      
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Service
+        working-directory: ${{ inputs.service-name }}
+        run: |
+          chmod +x gradlew
+          ./gradlew build -x test
+          
+  test:
+      runs-on: ubuntu-latest
+      container:
+        image: eclipse-temurin:21-jdk-alpine
+      needs: build
+      steps:
+        - name: Install compatibility libraries
+          run: apk add --no-cache libc6-compat gcompat libstdc++ git
+        
+        - name: Checkout code
+          uses: actions/checkout@v4
+          
+        - name: Test Service (with Testcontainers)
+          working-directory: ${{ inputs.service-name }}
+          run: |
+            chmod +x gradlew
+            ./gradlew test
+
+  build-image:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Docker Image
+        run: |
+          cd ${{ inputs.service-name }}
+          docker build -t myorg/${{ inputs.service-name }}:build .
+      
+      - name: Save Docker Image
+        run: |
+          docker save myorg/${{ inputs.service-name }}:build -o /tmp/${{ inputs.service-name }}-image.tar
+      
+      - name: Upload Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ inputs.service-name }}
+          path: /tmp/${{ inputs.service-name }}-image.tar
