@@ -64,12 +64,12 @@ jobs:
       matrix:
         include:
           - service: auth-service
-            condition: ${{ needs.detect-changes.outputs.auth == 'true' }}
+            skip: ${{ needs.detect-changes.outputs.auth != 'true' }}
           - service: gateway-service
-            condition: ${{ needs.detect-changes.outputs.gateway == 'true' }}
+            skip: ${{ needs.detect-changes.outputs.gateway != 'true' }}
           - service: user-service
-            condition: ${{ needs.detect-changes.outputs.user == 'true' }}
-    if: matrix.condition
+            skip: ${{ needs.detect-changes.outputs.user != 'true' }}
+    if: ${{ !matrix.skip }}
     uses: ./.github/workflows/service-build.yml
     secrets: inherit
     with:
