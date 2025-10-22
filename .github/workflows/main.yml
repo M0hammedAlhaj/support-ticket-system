@@ -77,7 +77,9 @@ jobs:
   # PHASE 2: Push (only if all builds succeeded)
   auth-push:
     needs: [detect-changes, verify-all-builds]
-    if: needs.detect-changes.outputs.auth == 'true' && needs.verify-all-builds.result == 'success'
+    if: |
+      needs.detect-changes.outputs.auth == 'true' && 
+      needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
     secrets: inherit
     with:
@@ -85,7 +87,9 @@ jobs:
 
   gateway-push:
     needs: [detect-changes, verify-all-builds]
-    if: needs.detect-changes.outputs.gateway == 'true' && needs.verify-all-builds.result == 'success'
+    if: |
+      needs.detect-changes.outputs.gateway == 'true' && 
+      needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
     secrets: inherit
     with:
@@ -93,7 +97,9 @@ jobs:
 
   user-push:
     needs: [detect-changes, verify-all-builds]
-    if: needs.detect-changes.outputs.user == 'true' && needs.verify-all-builds.result == 'success'
+    if: |
+      needs.detect-changes.outputs.user == 'true' && 
+      needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
     secrets: inherit
     with:
