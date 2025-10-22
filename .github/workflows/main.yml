@@ -33,7 +33,7 @@ jobs:
           fi
 
   detect-changes:
-    needs: build-image
+    needs: pre
     runs-on: ubuntu-latest
     outputs:
       auth: ${{ steps.filter.outputs.auth }}
