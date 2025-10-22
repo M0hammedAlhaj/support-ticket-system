@@ -1,0 +1,52 @@
+name: Orchestrator CI/CD
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.filter.outputs.auth }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      user: ${{ steps.filter.outputs.user }}
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            auth:
+              - 'auth-service/**'
+            gateway:
+              - 'gateway-service/**'
+            user:
+              - 'user-service/**'
+
+  auth-ci:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.auth == 'true'
+    uses: ./.github/workflows/service-ci.yml
+    secrets: inherit
+    with:
+      service-name: auth-service
+
+  gateway-ci:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.gateway == 'true'
+    uses: ./.github/workflows/service-ci.yml
+    secrets: inherit
+    with:
+      service-name: gateway-service
+
+  user-ci:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.user == 'true'
+    uses: ./.github/workflows/service-ci.yml
+    secrets: inherit
+    with:
+      service-name: user-service

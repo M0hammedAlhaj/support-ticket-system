@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: user-service-test
+  
+  data:
+    mongodb:
+      # URI and database will be set by DynamicPropertySource from Testcontainers
+      auto-index-creation: true
+      
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+grpc:
+  server:
+    port: 0
+
+logging:
+  level:
+    root: INFO
+    com.ticket.userservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
