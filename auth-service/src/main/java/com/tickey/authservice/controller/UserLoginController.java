@@ -38,7 +38,7 @@ public class UserLoginController extends LoginGrpcGrpc.LoginGrpcImplBase {
         } catch (StatusRuntimeException e) {
             if (e.getStatus().getCode() == Status.Code.NOT_FOUND) {
                 responseObserver.onError(Status.UNAUTHENTICATED
-                        .withDescription("Invalid email or password")
+                        .withDescription("Invalid email or password ")
                         .asRuntimeException());
             }
         }
