@@ -57,45 +57,35 @@ jobs:
             user:
               - 'user-service/**'
 
-  auth-build:
+  build-all:
     needs: detect-changes
-    if: needs.detect-changes.outputs.auth == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - service: auth-service
+            condition: ${{ needs.detect-changes.outputs.auth == 'true' }}
+          - service: gateway-service
+            condition: ${{ needs.detect-changes.outputs.gateway == 'true' }}
+          - service: user-service
+            condition: ${{ needs.detect-changes.outputs.user == 'true' }}
+    if: matrix.condition
     uses: ./.github/workflows/service-build.yml
     secrets: inherit
     with:
-      service-name: auth-service
-
-  gateway-build:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.gateway == 'true'
-    uses: ./.github/workflows/service-build.yml
-    secrets: inherit
-    with:
-      service-name: gateway-service
-
-  user-build:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.user == 'true'
-    uses: ./.github/workflows/service-build.yml
-    secrets: inherit
-    with:
-      service-name: user-service
+      service-name: ${{ matrix.service }}
 
   verify-all-builds:
-    needs: [auth-build, gateway-build, user-build]
+    needs: [build-all]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Check build results
         run: |
-          echo "auth-build: ${{ needs.auth-build.result }}"
-          echo "gateway-build: ${{ needs.gateway-build.result }}"
-          echo "user-build: ${{ needs.user-build.result }}"
+          echo "build-all: ${{ needs.build-all.result }}"
           
-          # Fail if any build that ran has failed
-          if [[ "${{ needs.auth-build.result }}" == "failure" ]] || \
-             [[ "${{ needs.gateway-build.result }}" == "failure" ]] || \
-             [[ "${{ needs.user-build.result }}" == "failure" ]]; then
+          # Fail if build failed
+          if [[ "${{ needs.build-all.result }}" == "failure" ]]; then
             echo " One or more builds failed"
             exit 1
           fi
