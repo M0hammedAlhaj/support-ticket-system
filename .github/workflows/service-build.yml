@@ -24,6 +24,7 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew build -x test
+          ./gradlew testClasses --no-daemon
           
       - name: Upload build artifacts and Gradle cache
         uses: actions/upload-artifact@v4
