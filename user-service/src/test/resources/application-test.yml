@@ -4,9 +4,8 @@ spring:
   
   data:
     mongodb:
-      host: localhost
-      port: 27017
-      database: testdb
+      # URI and database will be set by DynamicPropertySource from Testcontainers
+      auto-index-creation: true
       
   rabbitmq:
     host: localhost
@@ -16,9 +15,15 @@ spring:
 
 grpc:
   server:
-    port: 0  # Random port for tests
+    port: 0
 
 logging:
   level:
     root: INFO
     com.ticket.userservice: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
