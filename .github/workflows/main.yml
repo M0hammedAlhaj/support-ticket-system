@@ -78,6 +78,7 @@ jobs:
   auth-push:
     needs: [detect-changes, verify-all-builds]
     if: |
+      always() &&
       needs.detect-changes.outputs.auth == 'true' && 
       needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
@@ -88,6 +89,7 @@ jobs:
   gateway-push:
     needs: [detect-changes, verify-all-builds]
     if: |
+      always() &&
       needs.detect-changes.outputs.gateway == 'true' && 
       needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
@@ -98,6 +100,7 @@ jobs:
   user-push:
     needs: [detect-changes, verify-all-builds]
     if: |
+      always() &&
       needs.detect-changes.outputs.user == 'true' && 
       needs.verify-all-builds.result == 'success'
     uses: ./.github/workflows/service-push.yml
