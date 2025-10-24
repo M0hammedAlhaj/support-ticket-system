@@ -10,7 +10,7 @@ grpc:
     port: -1
   client:
     auth-service:
-      address: static://${AUTH_SERVICE_GRPC_HOST}:${AUTH_SERVICE_GRPC_PORT}
+      address: static://${AUTH_SERVICE_GRPC_HOST:localhost}:${AUTH_SERVICE_GRPC_PORT:9000}
       negotiationType: plaintext
 
 management:
