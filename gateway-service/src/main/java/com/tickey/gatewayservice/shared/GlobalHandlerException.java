@@ -15,7 +15,7 @@ public class GlobalHandlerException {
 
     @ExceptionHandler(StatusRuntimeException.class)
     public ResponseEntity<String> handleGrpcException(StatusRuntimeException ex) {
-        log.warn("gRPC exception handled: code={}, description={}  ",
+        log.warn("gRPC exception handled: code={}, description={}",
                 ex.getStatus().getCode(), ex.getStatus().getDescription(), ex);
 
         return switch (ex.getStatus().getCode()) {

@@ -63,16 +63,16 @@ jobs:
     steps:
       - name: Validate secrets
         run: |
-          if [[ -z "${{ secrets.JUMPING_SERVER_HOST }}" ]]; then
-            echo "❌ Error: JUMPING_SERVER_HOST secret is not set"
+          if [[ -z "${{ secrets.JUMPING_HOST }}" ]]; then
+            echo "❌ Error: JUMPING_HOST secret is not set"
             exit 1
           fi
-          if [[ -z "${{ secrets.JUMPING_SERVER_USER }}" ]]; then
-            echo "❌ Error: JUMPING_SERVER_USER secret is not set"
+          if [[ -z "${{ secrets.JUMPING_USER }}" ]]; then
+            echo "❌ Error: JUMPING_USER secret is not set"
             exit 1
           fi
-          if [[ -z "${{ secrets.JUMPING_SERVER_SSH_KEY }}" ]]; then
-            echo "❌ Error: JUMPING_SERVER_SSH_KEY secret is not set"
+          if [[ -z "${{ secrets.JUMPING_KEY }}" ]]; then
+            echo "❌ Error: JUMPING_KEY secret is not set"
             exit 1
           fi
           echo "✅ All required secrets are configured"
