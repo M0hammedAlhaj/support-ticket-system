@@ -1,0 +1,83 @@
+name: CD - Deploy Services
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth-service: ${{ steps.changes.outputs.auth-service }}
+      user-service: ${{ steps.changes.outputs.user-service }}
+      gateway-service: ${{ steps.changes.outputs.gateway-service }}
+      services: ${{ steps.set-services.outputs.services }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: changes
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            auth-service:
+              - 'auth-service/**'
+            user-service:
+              - 'user-service/**'
+            gateway-service:
+              - 'gateway-service/**'
+
+      - name: Set services matrix
+        id: set-services
+        env:
+          AUTH_CHANGED: ${{ steps.changes.outputs.auth-service }}
+          USER_CHANGED: ${{ steps.changes.outputs.user-service }}
+          GATEWAY_CHANGED: ${{ steps.changes.outputs.gateway-service }}
+        run: |
+          services="["
+          if [[ "${AUTH_CHANGED}" == "true" ]]; then
+            services="${services}\"auth-service\","
+          fi
+          if [[ "${USER_CHANGED}" == "true" ]]; then
+            services="${services}\"user-service\","
+          fi
+          if [[ "${GATEWAY_CHANGED}" == "true" ]]; then
+            services="${services}\"gateway-service\","
+          fi
+          services="${services%,}]"
+          echo "services=${services}" >> $GITHUB_OUTPUT
+          echo "Services to deploy: ${services}"
+
+  deploy-services:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.services != '[]'
+    runs-on: ubuntu-latest
+    env:
+      JUMPING_HOST: ${{ secrets.JUMPING_SERVER_HOST }}
+      JUMPING_USER: ${{ secrets.JUMPING_SERVER_USER }}
+      JUMPING_KEY: ${{ secrets.JUMPING_SERVER_SSH_KEY }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
+      fail-fast: false
+    steps:
+      - name: Deploy ${{ matrix.service }}
+        env:
+          SERVICE_NAME: ${{ matrix.service }}
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ env.JUMPING_HOST }}
+          username: ${{ env.JUMPING_USER }}
+          key: ${{ env.JUMPING_KEY }}
+          envs: SERVICE_NAME
+          script: |
+            ssh ${SERVICE_NAME} << 'EOF'
+              cd /home/ubuntu/
+              docker compose pull ${SERVICE_NAME}
+              docker compose up -d --build ${SERVICE_NAME}
+              echo "✅ ${SERVICE_NAME} deployed successfully"
+            EOF
