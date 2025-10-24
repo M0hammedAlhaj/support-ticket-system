@@ -61,14 +61,30 @@ jobs:
         service: ${{ fromJson(needs.detect-changes.outputs.services) }}
       fail-fast: false
     steps:
+      - name: Validate secrets
+        run: |
+          if [[ -z "${{ secrets.JUMPING_SERVER_HOST }}" ]]; then
+            echo "❌ Error: JUMPING_SERVER_HOST secret is not set"
+            exit 1
+          fi
+          if [[ -z "${{ secrets.JUMPING_SERVER_USER }}" ]]; then
+            echo "❌ Error: JUMPING_SERVER_USER secret is not set"
+            exit 1
+          fi
+          if [[ -z "${{ secrets.JUMPING_SERVER_SSH_KEY }}" ]]; then
+            echo "❌ Error: JUMPING_SERVER_SSH_KEY secret is not set"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured"
+          
       - name: Deploy ${{ matrix.service }}
         env:
           SERVICE_NAME: ${{ matrix.service }}
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.JUMPING_SERVER_HOST }}
-          username: ${{ secrets.JUMPING_SERVER_USER }}
-          key: ${{ secrets.JUMPING_SERVER_SSH_KEY }}
+          host: ${{ secrets.JUMPING_HOST }}
+          username: ${{ secrets.JUMPING_USER }}
+          key: ${{ secrets.JUMPING_KEY }}
           envs: SERVICE_NAME
           script: |
             ssh ${SERVICE_NAME} << 'EOF'
